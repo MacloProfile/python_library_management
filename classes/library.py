@@ -9,7 +9,8 @@ class Library:
         self.create_tables()
 
     def create_tables(self):
-        """Метод для создания таблиц books и genres в базе данных, если они не существуют."""
+        """Метод для создания таблиц books и genres в базе данных,
+            если они не существуют."""
         with sqlite3.connect(self.db_path) as connection:
             cursor = connection.cursor()
             # Создание таблицы books с полями title, author, description, genre
@@ -32,7 +33,8 @@ class Library:
             count = cursor.fetchone()[0]
             if count == 0:
                 # Если нет, то добавляем стандартные жанры
-                cursor.executemany("INSERT INTO genres (name) VALUES (?)", [("Фантастика",), ("Роман",), ("Поэзия",)])
+                cursor.executemany("INSERT INTO genres (name) VALUES (?)",
+                                   [("Фантастика",), ("Роман",), ("Поэзия",)])
                 connection.commit()
 
     def add_book(self, book):
@@ -40,15 +42,21 @@ class Library:
         with sqlite3.connect(self.db_path) as connection:
             cursor = connection.cursor()
             # Вставка данных о книге в таблицу books
-            cursor.execute("INSERT INTO books (title, author, description, genre) VALUES (?, ?, ?, ?)",
-                           (book.title, book.author, book.description, book.genre))
+            cursor.execute("INSERT INTO books"
+                           " (title, author, description, genre)"
+                           " VALUES (?, ?, ?, ?)",
+                           (book.title,
+                            book.author,
+                            book.description,
+                            book.genre))
 
     def search_books(self, keyword):
         """Метод для поиска книг по ключевому слову."""
         with sqlite3.connect(self.db_path) as connection:
             cursor = connection.cursor()
-            # Поиск книг по названию или автору, содержащих заданное ключевое слово
-            cursor.execute("SELECT * FROM books WHERE title LIKE ? OR author LIKE ?",
+            # Поиск книг по названию или автору
+            cursor.execute("SELECT * FROM books WHERE title"
+                           " LIKE ? OR author LIKE ?",
                            ('%' + keyword + '%', '%' + keyword + '%'))
             return cursor.fetchall()
 
@@ -58,38 +66,44 @@ class Library:
             cursor = connection.cursor()
             cursor.execute("SELECT title, author FROM books")
             books = cursor.fetchall()
-            match bool(books):
-                # Если есть книги в базе данных
-                case True:
-                    print("Список книг в библиотеке:")
-                    for idx, book in enumerate(books, start=1):
-                        print(f'№{idx}. Название книги: "{book[0]}"; Автор: {book[1]}')
 
-                    # Предоставляем выбор действия пользователю
-                    choice = input("\n1. Просмотреть подробную информацию о книге\n"
-                                   "2. Вывести книги с определенным жанром\n3. Выход в главное меню\n"
-                                   "Выберите действие: ")
-                    match choice:
-                        # Просмотр подробной информации о книге
-                        case "1":
-                            book_choice = int(input("Введите номер книги для просмотра подробной информации: "))
-                            if 1 <= book_choice <= len(books):
-                                selected_book = books[book_choice - 1]
-                                self.display_book_details(selected_book)
-                            else:
-                                print("Некорректный номер книги. Попробуйте снова.")
-                        # Вывод книг по заданному жанру
-                        case "2":
-                            self.display_books_by_genre_prompt()
-                        # Возвращаемся в главное меню
-                        case "3":
-                            return
-                        # Некорректный ввод
-                        case _:
-                            print("Некорректный ввод! Попробуйте снова.")
-                # Если нет книг в базе данных
-                case False:
-                    print("В библиотеке нет книг.")
+            # Если есть книги в базе данных
+            if bool(books):
+                print("Список книг в библиотеке:")
+                for idx, book in enumerate(books, start=1):
+                    print(f'№{idx}. '
+                          f'Название книги: "{book[0]}"; '
+                          f'Автор: {book[1]}')
+
+                # Предоставляем выбор действия пользователю
+                choice = input("\n1. Просмотреть подробную информацию о книге"
+                               "\n2. Вывести книги с определенным жанром"
+                               "\n3. Выход в главное меню\n"
+                               "Выберите действие: ")
+                match choice:
+                    # Просмотр подробной информации о книге
+                    case "1":
+                        book_choice = int(input("Введите номер книги для"
+                                                " просмотра подробной"
+                                                " информации: "))
+                        if 1 <= book_choice <= len(books):
+                            selected_book = books[book_choice - 1]
+                            self.display_book_details(selected_book)
+                        else:
+                            print("Некорректный номер книги. "
+                                  "Попробуйте снова.")
+                    # Вывод книг по заданному жанру
+                    case "2":
+                        self.display_books_by_genre_prompt()
+                    # Возвращаемся в главное меню
+                    case "3":
+                        return
+                    # Некорректный ввод
+                    case _:
+                        print("Некорректный ввод! Попробуйте снова.")
+            # Если нет книг в базе данных
+            else:
+                print("В библиотеке нет книг.")
 
     def display_book_details(self, selected_book):
         """Метод для отображения подробной информации о книге."""
@@ -97,7 +111,8 @@ class Library:
         with sqlite3.connect(self.db_path) as connection:
             cursor = connection.cursor()
             cursor.execute(
-                "SELECT description, genre FROM books WHERE title=? AND author=?",
+                "SELECT description, genre "
+                "FROM books WHERE title=? AND author=?",
                 (title, author)
             )
             book_info = cursor.fetchone()
@@ -112,7 +127,8 @@ class Library:
                 print("Информация о книге не найдена.")
 
     def display_books_by_genre_prompt(self):
-        """Метод для отображения списка книг определенного жанра (по запросу пользователя)."""
+        """Метод для отображения списка книг определенного жанра
+         (по запросу пользователя)."""
         genre = input("Введите жанр книги для отображения: ")
         self.display_books_by_genre(genre)
 
@@ -120,7 +136,8 @@ class Library:
         """Метод для отображения списка книг определенного жанра."""
         with sqlite3.connect(self.db_path) as connection:
             cursor = connection.cursor()
-            cursor.execute("SELECT title, author FROM books WHERE genre=?", (genre,))
+            cursor.execute("SELECT title, author "
+                           "FROM books WHERE genre=?", (genre,))
             genre_books = cursor.fetchall()
             if genre_books:
                 print(f"\nКниги жанра '{genre}':")
@@ -166,13 +183,17 @@ class Library:
             if books:
                 print("Список книг в библиотеке:")
                 for idx, book in enumerate(books, start=1):
-                    print(f'№{idx}. Название книги: "{book[0]}"; Автор: {book[1]}')
+                    print(f'№{idx}. '
+                          f'Название книги: "{book[0]}"; '
+                          f'Автор: {book[1]}')
                 try:
-                    book_number = int(input("Введите номер книги для удаления: "))
-                    selected_book = books[book_number - 1][0]
-                    author = books[book_number - 1][1]
+                    number = int(input("Введите номер книги для удаления: "))
+                    selected_book = books[number - 1][0]
+                    author = books[number - 1][1]
                     # Удаление книги из таблицы books
-                    cursor.execute("DELETE FROM books WHERE title=? AND author=?", (selected_book, author,))
+                    cursor.execute("DELETE FROM books"
+                                   " WHERE title=? AND author=?",
+                                   (selected_book, author,))
                     print("Книга удалена.")
                 except IndexError:
                     print("Некорректный номер книги.")

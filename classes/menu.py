@@ -5,10 +5,12 @@ class Menu:
     @staticmethod
     def start_controller(library):
         """
-        Метод запускает контроллер меню, который обрабатывает пользовательские запросы.
+        Метод запускает контроллер меню,
+        который обрабатывает пользовательские запросы.
 
         Args:
-            library (Library): Экземпляр класса Library для работы с базой данных книг.
+            library (Library): Экземпляр класса Library
+            для работы с базой данных книг.
         """
 
         while True:
@@ -44,7 +46,8 @@ class Menu:
                     if found_books:
                         print("\nНайденные книги:")
                         for book in found_books:
-                            print(f'Название книги: "{book[0]}"; Автор: {book[1]}')
+                            print(f'Название книги: "{book[0]}"; '
+                                  f'Автор: {book[1]}')
                     else:
                         print("\nКниги с данным ключевым словом не найдены.")
 
