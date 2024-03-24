@@ -58,30 +58,38 @@ class Library:
             cursor = connection.cursor()
             cursor.execute("SELECT title, author FROM books")
             books = cursor.fetchall()
-            if books:
-                print("Список книг в библиотеке:")
-                for idx, book in enumerate(books, start=1):
-                    print(f'№{idx}. Название книги: "{book[0]}"; Автор: {book[1]}')
+            match bool(books):
+                # Если есть книги в базе данных
+                case True:
+                    print("Список книг в библиотеке:")
+                    for idx, book in enumerate(books, start=1):
+                        print(f'№{idx}. Название книги: "{book[0]}"; Автор: {book[1]}')
 
-                # Предоставляем выбор действия пользователю
-                choice = input("\n1. Просмотреть подробную информацию о книге\n"
-                               "2. Вывести книги с определенным жанром\n3. Выход в главное меню\n"
-                               "Выберите действие: ")
-                if choice == "1":
-                    book_choice = int(input("Введите номер книги для просмотра подробной информации: "))
-                    if 1 <= book_choice <= len(books):
-                        selected_book = books[book_choice - 1]
-                        self.display_book_details(selected_book)
-                    else:
-                        print("Некорректный номер книги. Попробуйте снова.")
-                elif choice == "2":
-                    self.display_books_by_genre_prompt()
-                elif choice == "3":
-                    return
-                else:
-                    print("Некорректный ввод! Попробуйте снова.")
-            else:
-                print("В библиотеке нет книг.")
+                    # Предоставляем выбор действия пользователю
+                    choice = input("\n1. Просмотреть подробную информацию о книге\n"
+                                   "2. Вывести книги с определенным жанром\n3. Выход в главное меню\n"
+                                   "Выберите действие: ")
+                    match choice:
+                        # Просмотр подробной информации о книге
+                        case "1":
+                            book_choice = int(input("Введите номер книги для просмотра подробной информации: "))
+                            if 1 <= book_choice <= len(books):
+                                selected_book = books[book_choice - 1]
+                                self.display_book_details(selected_book)
+                            else:
+                                print("Некорректный номер книги. Попробуйте снова.")
+                        # Вывод книг по заданному жанру
+                        case "2":
+                            self.display_books_by_genre_prompt()
+                        # Возвращаемся в главное меню
+                        case "3":
+                            return
+                        # Некорректный ввод
+                        case _:
+                            print("Некорректный ввод! Попробуйте снова.")
+                # Если нет книг в базе данных
+                case False:
+                    print("В библиотеке нет книг.")
 
     def display_book_details(self, selected_book):
         """Метод для отображения подробной информации о книге."""
